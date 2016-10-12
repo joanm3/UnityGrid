@@ -13,12 +13,16 @@ public class LevelGrid : MonoBehaviour
     public bool snapToGrid = true;
     public Pow2 gridSize = Pow2.g128;
     public Pow2 height;
+
+    [HideInInspector]
     public GameObject selectedGameObject; 
 
     [SerializeField]
     private int m_sizeColums = 25;
     [SerializeField]
     private int m_sizeRows = 10;
+    //[SerializeField]
+    private int m_gridMultiplier = 128; 
 
     private int m_realSizeColums;
     private int m_realSizeRows;
@@ -126,9 +130,9 @@ public class LevelGrid : MonoBehaviour
     private void Update()
     {
         transform.position = Vector3.zero;
-
-        m_realSizeColums = m_sizeColums * 128;
-        m_realSizeRows = m_sizeRows * 128;
+        m_gridMultiplier = (int)gridSize; 
+        m_realSizeColums = m_sizeColums * m_gridMultiplier;
+        m_realSizeRows = m_sizeRows * m_gridMultiplier;
 
         m_boxCollider.size = new Vector3(m_realSizeColums, 0f, m_realSizeRows);
         m_boxCollider.center = new Vector3(m_realSizeColums / 2f, (int)height, m_realSizeRows / 2f);
