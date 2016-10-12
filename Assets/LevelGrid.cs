@@ -13,6 +13,7 @@ public class LevelGrid : MonoBehaviour
     public bool snapToGrid = true;
     public Pow2 gridSize = Pow2.g128;
     public Pow2 height;
+    public float multiplicationValue = 1f; 
 
     [HideInInspector]
     public GameObject selectedGameObject; 
@@ -127,7 +128,7 @@ public class LevelGrid : MonoBehaviour
 
     }
 
-    private void Update()
+    public void Update()
     {
         transform.position = Vector3.zero;
         m_gridMultiplier = (int)gridSize; 

@@ -1,25 +1,29 @@
 ﻿using UnityEngine;
 using System.Collections;
-using UnityEditor; 
+using UnityEditor;
 
 [CustomEditor(typeof(LevelGrid))]
 public class LevelGridEditor : Editor
 {
 
 
-    
 
-    private void OnEnable()
+
+    override public void OnInspectorGUI()
     {
+        DrawDefaultInspector(); 
 
+        if(GUILayout.Button("Open Grid Window", GUILayout.Width(255)))
+        {
+            OpenLevelGridWindow(); 
+        }
     }
 
-
-
-    private void EventHandler()
+    [MenuItem("Custom/Level Grid")]
+    static public void OpenLevelGridWindow()
     {
-
-
+        LevelGridWindow window = (LevelGridWindow)EditorWindow.GetWindow(typeof(LevelGridWindow));
+        window.Init();
     }
 
 
