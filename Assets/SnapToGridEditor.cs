@@ -51,17 +51,18 @@ public class SnapToGridEditor : Editor
                 worldRay.origin.z * worldRay.direction.z);
         }
 
-        int col = (int)gridPos.x / (int)LevelGrid.Ins.gridSize;
-        int row = (int)gridPos.z / (int)LevelGrid.Ins.gridSize;
+        //mouse position in the grid
+        float col = (float)gridPos.x / ((float)LevelGrid.Ins.gridSize * LevelGrid.Ins.scaleFactor);
+        float row = (float)gridPos.z / ((float)LevelGrid.Ins.gridSize * LevelGrid.Ins.scaleFactor);
 
-        EditorGUI.BeginChangeCheck();
-
+        //mouse click and dragandrop
         if (Event.current.type == EventType.MouseDown && Event.current.button == 0 ||
             Event.current.type == EventType.MouseDrag && Event.current.button == 0)
         {
-            SnapToGrid(col, row);
+            SnapToGrid((int)col, (int)row);
         }
 
+        //check if control is pressed. 
         if ((Event.current.type == EventType.keyDown) && (Event.current.keyCode == KeyCode.LeftControl || Event.current.keyCode == KeyCode.RightControl))
             m_controlPressed = true;
 
@@ -104,6 +105,17 @@ public class SnapToGridEditor : Editor
         {
             obj = Instantiate(m_myTarget.gameObject);
             obj.name = m_myTarget.gameObject.name;
+
+            //cant Get Material Here. Have to be called from monobehaviour i think. 
+            //Material material = obj.GetComponent<Material>();
+            //if (material == null)
+            //    material = obj.GetComponentInChildren<Material>();
+            //if (material)
+            //{
+            //    Color color = material.color;
+            //    material.color = new Color(material.color.r, material.color.g, material.color.b, 0.5f);
+            //}
+
             LevelGrid.Ins.selectedGameObject = obj;
             m_instantiated = true;
             Undo.RegisterCreatedObjectUndo(obj, "Create " + obj.name);

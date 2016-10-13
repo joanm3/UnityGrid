@@ -12,21 +12,21 @@ public class LevelGrid : MonoBehaviour
     public enum Pow2 { g0 = 0, g1 = 1, g2 = 2, g4 = 4, g8 = 8, g16 = 16, g32 = 32, g64 = 64, g128 = 128, g256 = 256, g512 = 512, g1024 = 1024, g2048 = 2048 }
     public bool snapToGrid = true;
     public Pow2 gridSize = Pow2.g128;
-    public Pow2 height;
-    public float multiplicationValue = 1f; 
+    public float height;
+    [Tooltip("Standard 3DSMax = 0.0254")]
+    public float scaleFactor = 0.0254f;
 
     [HideInInspector]
-    public GameObject selectedGameObject; 
+    public GameObject selectedGameObject;
 
     [SerializeField]
-    private int m_sizeColums = 25;
+    private float m_sizeColums = 25;
     [SerializeField]
-    private int m_sizeRows = 10;
-    //[SerializeField]
-    private int m_gridMultiplier = 128; 
+    private float m_sizeRows = 10;
 
-    private int m_realSizeColums;
-    private int m_realSizeRows;
+
+    private float m_realSizeColums;
+    private float m_realSizeRows;
 
     //private GameObject m_selectedGameObject; 
     private BoxCollider m_boxCollider;
@@ -35,74 +35,89 @@ public class LevelGrid : MonoBehaviour
     private readonly Color _normalColor = Color.grey;
     private readonly Color _selectedColor = Color.yellow;
 
-    public int SizeColumns
+    public float SizeColumns
     {
-        get { return m_realSizeColums; }
+        get { return m_sizeColums; }
         set { m_sizeColums = value; }
     }
 
-    public int SizeRows
+    public float SizeRows
     {
-        get { return m_realSizeRows; }
+        get { return m_sizeRows; }
         set { m_sizeRows = value; }
     }
 
-    private void GridFrameGizmo(int cols, int rows)
+    private void GridFrameGizmo(float cols, float rows)
     {
-        Gizmos.DrawLine(new Vector3(0, (int)height, 0), new Vector3(0, (int)height, rows * (int)gridSize));
-        Gizmos.DrawLine(new Vector3(0, (int)height, 0), new Vector3(cols * (int)gridSize, (int)height, 0));
-        Gizmos.DrawLine(new Vector3(cols * (int)gridSize, (int)height, 0), new Vector3(cols * (int)gridSize, (int)height, rows * (int)gridSize));
-        Gizmos.DrawLine(new Vector3(0, (int)height, rows * (int)gridSize), new Vector3(cols * (int)gridSize, (int)height, rows * (int)gridSize));
+        Gizmos.DrawLine(new Vector3(0, (float)height * scaleFactor, 0), new Vector3(0, (float)height, rows * (float)gridSize * scaleFactor));
+        Gizmos.DrawLine(new Vector3(0, (float)height * scaleFactor, 0), new Vector3(cols * (float)gridSize * scaleFactor, (float)height * scaleFactor, 0));
+        Gizmos.DrawLine(new Vector3(cols * (float)gridSize, (float)height, 0), new Vector3(cols * (float)gridSize, (float)height, rows * (float)gridSize * scaleFactor));
+        Gizmos.DrawLine(new Vector3(0, (float)height * scaleFactor, rows * (float)gridSize * scaleFactor), new Vector3(cols * (float)gridSize * scaleFactor, (float)height * scaleFactor, rows * (float)gridSize * scaleFactor));
     }
 
-    private void GridGizmo(int cols, int rows)
+    private void GridGizmo(float cols, float rows, float length, float width)
     {
         for (int i = 1; i < cols; i++)
         {
-            Gizmos.DrawLine(new Vector3(i * (int)gridSize, (int)height, 0), new Vector3(i * (int)gridSize, (int)height, rows * (int)gridSize));
+            Gizmos.DrawLine(
+                new Vector3(i * ((float)gridSize) * scaleFactor, (float)height * scaleFactor, 0), 
+                new Vector3(i * (float)gridSize * scaleFactor, (float)height * scaleFactor, rows * (float)gridSize * scaleFactor));
+        }
+        for (int j = 1; j < rows ; j++)
+        {
+            Gizmos.DrawLine(new Vector3(0, (float)height * scaleFactor, j * (float)gridSize) * scaleFactor, new Vector3(cols * (float)gridSize * scaleFactor, (float)height * scaleFactor, j * (float)gridSize * scaleFactor));
+        }
+    }
+
+    private void GridGizmo(float length, float width)
+    {
+        float cols;
+        float rows;
+
+        cols = length / ((float)(gridSize) * scaleFactor);
+        rows = width / ((float)(gridSize) * scaleFactor);
+
+
+        for (int i = 1; i < cols; i++)
+        {
+            Gizmos.DrawLine(
+                new Vector3(i * ((float)gridSize) * scaleFactor, (float)height * scaleFactor, 0),
+                new Vector3(i * (float)gridSize * scaleFactor, (float)height * scaleFactor, rows * (float)gridSize * scaleFactor));
         }
         for (int j = 1; j < rows; j++)
         {
-            Gizmos.DrawLine(new Vector3(0, (int)height, j * (int)gridSize), new Vector3(cols * (int)gridSize, (int)height, j * (int)gridSize));
+            Gizmos.DrawLine(new Vector3(0, (float)height * scaleFactor, j * (float)gridSize) * scaleFactor, new Vector3(cols * (float)gridSize * scaleFactor, (float)height * scaleFactor, j * (float)gridSize * scaleFactor));
         }
     }
 
     public Vector3 WorldToGridCoordinates(Vector3 point)
     {
         Vector3 gridPoint = new Vector3(
-            (int)((point.x - transform.position.x) / (int)gridSize), (int)height,
-            (int)((point.z - transform.position.z) / (int)gridSize));
+            (float)((point.x - transform.position.x) / (float)gridSize) * scaleFactor, (float)height * scaleFactor,
+            (float)((point.z - transform.position.z) / (float)gridSize) * scaleFactor);
         return gridPoint;
-    }
-
-    public Vector3 GridToWorldCoordinates(int col, int row)
-    {
-        Vector3 worldPoint = new Vector3(
-            transform.position.x + (col * (int)gridSize), (int)height,
-            transform.position.z + (row * (int)gridSize));
-        return worldPoint;
     }
 
     public Vector3 GridToWorldCoordinates(float col, float row)
     {
         Vector3 worldPoint = new Vector3(
-            transform.position.x + (col * (int)gridSize + (int)gridSize / 2.0f), (int)height,
-            transform.position.z + (row * (int)gridSize + (int)gridSize / 2.0f));
+            transform.position.x + (col * (float)gridSize) * scaleFactor, (float)height * scaleFactor,
+            transform.position.z + (row * (float)gridSize) * scaleFactor);
         return worldPoint;
     }
 
     public bool IsInsideGridBounds(Vector3 point)
     {
         float minX = transform.position.x;
-        float maxX = minX + m_realSizeColums * (int)gridSize;
+        float maxX = minX + m_sizeColums;
         float minZ = transform.position.z;
-        float maxZ = minZ + m_realSizeRows * (int)gridSize;
+        float maxZ = minZ + m_sizeColums;
         return (point.x >= minX && point.x <= maxX && point.z >= minZ && point.z <= maxZ);
     }
 
-    public bool IsInsideGridBounds(int col, int row)
+    public bool IsInsideGridBounds(float col, float row)
     {
-        return (col >= 0 && col < m_realSizeColums && row >= 0 && row < m_realSizeRows);
+        return (col >= 0 && col < (m_sizeColums) && row >= 0 && row < (m_sizeColums));
     }
 
     private void Awake()
@@ -131,12 +146,12 @@ public class LevelGrid : MonoBehaviour
     public void Update()
     {
         transform.position = Vector3.zero;
-        m_gridMultiplier = (int)gridSize; 
-        m_realSizeColums = m_sizeColums * m_gridMultiplier;
-        m_realSizeRows = m_sizeRows * m_gridMultiplier;
+        //m_gridMultiplier = (float)gridSize; 
+        m_realSizeColums = m_sizeColums * scaleFactor * (float)gridSize;
+        m_realSizeRows = m_sizeRows * scaleFactor * (float)gridSize;
 
         m_boxCollider.size = new Vector3(m_realSizeColums, 0f, m_realSizeRows);
-        m_boxCollider.center = new Vector3(m_realSizeColums / 2f, (int)height, m_realSizeRows / 2f);
+        m_boxCollider.center = new Vector3(m_realSizeColums / 2f, (float)height, m_realSizeRows / 2f);
     }
 
     private void OnDrawGizmos()
@@ -144,25 +159,21 @@ public class LevelGrid : MonoBehaviour
         Color oldColor = Gizmos.color;
         Gizmos.color = _normalColor;
 
-        if ((int)gridSize == 0)
+        if ((float)gridSize == 0)
             return;
+        //GridGizmo(m_realSizeColums / ((float)gridSize * scaleFactor), m_realSizeRows / ((float)gridSize * scaleFactor));
+        GridGizmo(128, 128);
 
-        GridGizmo(m_realSizeColums / (int)gridSize, m_realSizeRows / (int)gridSize);
         Gizmos.color = _selectedColor;
-        GridFrameGizmo(m_realSizeColums / (int)gridSize, m_realSizeRows / (int)gridSize);
+
+        GridFrameGizmo(m_realSizeColums / ((float)gridSize * scaleFactor), m_realSizeRows / ((float)gridSize * scaleFactor));
         Gizmos.color = oldColor;
     }
 
-    private void OnDrawGizmosSelected()
+    [MenuItem("GameObject/3D Object/Custom Object")]
+    public static void CreateObject()
     {
-        Color oldColor = Gizmos.color;
-        Gizmos.color = _selectedColor;
-
-        if ((int)gridSize == 0)
-            return;
-
-        GridFrameGizmo(m_realSizeColums / (int)gridSize, m_realSizeRows / (int)gridSize);
-        Gizmos.color = oldColor;
+        GameObject go = Instantiate(Resources.Load("SnapToGridTest", typeof(GameObject))) as GameObject;
     }
 
 }

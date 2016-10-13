@@ -4,7 +4,7 @@ using System.Collections;
 
 public class LevelGridWindow : EditorWindow
 {
-    LevelGrid m_levelGrid; 
+    LevelGrid m_levelGrid = null; 
 
     public void Init()
     {
@@ -13,6 +13,11 @@ public class LevelGridWindow : EditorWindow
 
     void OnGUI()
     {
+        if (m_levelGrid == null)
+        {
+            Init(); 
+        }
+
         m_levelGrid.gridSize = (LevelGrid.Pow2)EditorGUILayout.EnumPopup("Grid Size: ", m_levelGrid.gridSize);
         m_levelGrid.Update(); 
     }
