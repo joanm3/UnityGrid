@@ -24,14 +24,11 @@ public class LevelGridEditor : Editor
     {
         if (!_myTarget)
             _myTarget = target as LevelGrid;
-        //if (_myTarget)
-        //    ToolsSupport.UnityHandlesHidden = _myTarget.hideUnityHandles;
 
         _myTarget.transform.position = Vector3.zero;
 
         float cols = _myTarget.sizeColums;
         float rows = _myTarget.sizeRows;
-
 
         //properly place the collider
         _myTarget.boxCollider.size = new Vector3(cols, 0f, rows);

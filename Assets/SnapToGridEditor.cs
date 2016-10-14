@@ -10,6 +10,9 @@ public class SnapToGridEditor : Editor
     bool m_instantiated = false;
     private bool m_controlPressed = false;
     float distance;
+    Vector3 gridPos = new Vector3();
+    GameObject onMouseOverGameObject;
+    bool isThisObject = false;
 
     //GameObject m_instantiatedGameObject = new GameObject(); 
 
@@ -32,49 +35,47 @@ public class SnapToGridEditor : Editor
 
         HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Native));
         Ray worldRay = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
-        Vector3 gridPos = Vector3.zero;
 
-        RaycastHit hitInfo;
-        
-        //if (Physics.Raycast(worldRay, out hitInfo, 10000, LayerMask.NameToLayer("Grid")))
-        if (Physics.Raycast(worldRay, out hitInfo, 10000))
-        {
-            //would be better to change the raycast for
-            //something that calculates high 
-            //its always saved as a parameter, so maybe 
-            //no need to raycast. 
+        RaycastHit[] hits;
+        hits = Physics.RaycastAll(worldRay, 1000);
 
-            //if (hitInfo.transform.tag == "Grid")
-            //if (hitInfo.transform.gameObject.name == "LevelGrid")
-            //{
-            gridPos = hitInfo.point;
-            //}
-        }
-        else
+        for (int i = 0; i < hits.Length; i++)
         {
-            gridPos = new Vector3(
-                worldRay.origin.x * worldRay.direction.x,
-                worldRay.origin.y * worldRay.direction.y,
-                worldRay.origin.z * worldRay.direction.z);
+            if (hits[i].transform.gameObject.layer == LayerMask.NameToLayer("Grid"))
+            {
+                gridPos = hits[i].point;
+            }
+
+            if (hits[i].transform.GetComponent<SnapToGrid>() != null)
+            {
+                onMouseOverGameObject = hits[i].transform.gameObject;
+            }
+            else
+            {
+                onMouseOverGameObject = null;
+            }
         }
 
         //mouse position in the grid
         float col = (float)gridPos.x / ((float)LevelGrid.Ins.gridSize * LevelGrid.Ins.scaleFactor);
         float row = (float)gridPos.z / ((float)LevelGrid.Ins.gridSize * LevelGrid.Ins.scaleFactor);
 
-
-
-
-
-        
-
         if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
         {
-            distance = Vector3.Distance(m_myTarget.transform.position, gridPos);
+            if (onMouseOverGameObject == m_myTarget.gameObject)
+            {
+                isThisObject = true;
+            }
+            else
+            {
+                isThisObject = false;
+                if (onMouseOverGameObject != null)
+                    Selection.activeGameObject = onMouseOverGameObject;
+            }
         }
 
-        //if (distance > 10)
-        //    return; 
+        if (!isThisObject)
+            return; 
 
         //mouse click and dragandrop
         //if (Event.current.type == EventType.MouseDown && Event.current.button == 0 ||
