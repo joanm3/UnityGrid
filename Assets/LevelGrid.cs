@@ -122,6 +122,8 @@ public class LevelGrid : MonoBehaviour
         if (Ins == null)
             Ins = this;
 
+        gameObject.name = "LevelGrid"; 
+
         boxCollider = GetComponent<BoxCollider>();
     }
 

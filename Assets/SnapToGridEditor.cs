@@ -36,9 +36,15 @@ public class SnapToGridEditor : Editor
         RaycastHit hitInfo;
         if (Physics.Raycast(worldRay, out hitInfo, 10000))
         {
+            //would be better to change the raycast for
+            //something that calculates high 
+            //its always saved as a parameter, so maybe 
+            //no need to raycast. 
+
             //if (hitInfo.transform.tag == "Grid")
+            //if (hitInfo.transform.gameObject.name == "LevelGrid")
             //{
-            gridPos = hitInfo.point;
+                gridPos = hitInfo.point;
             //}
         }
         else
