@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEditor;
-using EditorSupport;
+using EditorSupport; 
 
 [CustomEditor(typeof(LevelGrid))]
 public class LevelGridEditor : Editor
@@ -24,18 +24,21 @@ public class LevelGridEditor : Editor
     {
         if (!_myTarget)
             _myTarget = target as LevelGrid;
-        if (_myTarget)
-            ToolsSupport.UnityHandlesHidden = _myTarget.hideUnityHandles;
+        //if (_myTarget)
+        //    ToolsSupport.UnityHandlesHidden = _myTarget.hideUnityHandles;
 
         _myTarget.transform.position = Vector3.zero;
 
         float cols = _myTarget.sizeColums;
         float rows = _myTarget.sizeRows;
 
+
+        //properly place the collider
         _myTarget.boxCollider.size = new Vector3(cols, 0f, rows);
         _myTarget.boxCollider.center = new Vector3(cols / 2f, (float)_myTarget.height, rows / 2f);
 
-        LevelGrid.Ins.UpdateGridHeight(); 
+        LevelGrid.Ins.UpdateInputGridHeight();
+        ToolsSupport.UnityHandlesHidden = _myTarget.hideUnityHandles; 
     }
 
 

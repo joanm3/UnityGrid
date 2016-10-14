@@ -19,7 +19,7 @@ public class LevelGridWindow : EditorWindow
         }
 
         m_levelGrid.gridSize = (LevelGrid.Pow2)EditorGUILayout.EnumPopup("Grid Size: ", m_levelGrid.gridSize);
-        m_levelGrid.Update(); 
+        //m_levelGrid.Update(); 
     }
 
 }

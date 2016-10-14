@@ -29,8 +29,6 @@ public class SnapToGridEditor : Editor
         if (m_myTarget == null)
             m_myTarget = target as SnapToGrid;
 
-
-
         HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Native));
         Ray worldRay = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
         Vector3 gridPos = Vector3.zero;
@@ -62,8 +60,7 @@ public class SnapToGridEditor : Editor
             SnapToGrid((int)col, (int)row, LevelGrid.Ins.height);
         }
 
-
-        LevelGrid.Ins.UpdateGridHeight(); 
+        LevelGrid.Ins.UpdateInputGridHeight();
 
         //check if control is pressed. 
         if ((Event.current.type == EventType.keyDown) && (Event.current.keyCode == KeyCode.LeftControl || Event.current.keyCode == KeyCode.RightControl))
@@ -71,6 +68,7 @@ public class SnapToGridEditor : Editor
 
         if ((Event.current.type == EventType.keyUp) && (Event.current.keyCode == KeyCode.LeftControl || Event.current.keyCode == KeyCode.RightControl))
             m_controlPressed = false;
+
 
         if (Event.current.type == EventType.MouseUp && Event.current.button == 0)
         {
@@ -106,7 +104,20 @@ public class SnapToGridEditor : Editor
         //GameObject obj;
         if (!m_instantiated)
         {
-            obj = Instantiate(m_myTarget.gameObject);
+
+            if (PrefabUtility.GetPrefabParent(Selection.activeObject) != null)
+            {
+                //obj = (GameObject)Instantiate(PrefabUtility.GetPrefabParent(Selection.activeObject));
+                //obj = PrefabUtility.InstantiatePrefab(Selection.activeObject as GameObject) as GameObject;
+                //obj = (GameObject)Instantiate(PrefabUtility.GetPrefabObject(Selection.activeObject));
+                obj = PrefabUtility.InstantiatePrefab(PrefabUtility.GetPrefabParent(Selection.activeObject) as GameObject) as GameObject;
+            }
+            else
+            {
+                Debug.Log("prefab parent not found");
+                obj = Instantiate(m_myTarget.gameObject);
+            }
+
             obj.name = m_myTarget.gameObject.name;
 
             LevelGrid.Ins.selectedGameObject = obj;
