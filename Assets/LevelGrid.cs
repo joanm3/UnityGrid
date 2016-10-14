@@ -15,7 +15,6 @@ public class LevelGrid : MonoBehaviour
     public float height;
     [Tooltip("Standard 3DSMax = 0.0254")]
     public float scaleFactor = 0.0254f;
-
     [HideInInspector]
     public GameObject selectedGameObject;
 
@@ -23,12 +22,6 @@ public class LevelGrid : MonoBehaviour
     private float m_sizeColums = 25;
     [SerializeField]
     private float m_sizeRows = 10;
-
-
-    private float m_realSizeColums;
-    private float m_realSizeRows;
-
-    //private GameObject m_selectedGameObject; 
     private BoxCollider m_boxCollider;
 
 
@@ -47,12 +40,18 @@ public class LevelGrid : MonoBehaviour
         set { m_sizeRows = value; }
     }
 
-    private void GridFrameGizmo(float cols, float rows)
+    private void GridFrameGizmo(float length, float width)
     {
+        float cols;
+        float rows;
+
+        cols = (length / ((float)(gridSize) * scaleFactor)); 
+        rows = (width / ((float)(gridSize) * scaleFactor));
+
         Gizmos.DrawLine(new Vector3(0, (float)height * scaleFactor, 0), new Vector3(0, (float)height, rows * (float)gridSize * scaleFactor));
         Gizmos.DrawLine(new Vector3(0, (float)height * scaleFactor, 0), new Vector3(cols * (float)gridSize * scaleFactor, (float)height * scaleFactor, 0));
-        Gizmos.DrawLine(new Vector3(cols * (float)gridSize, (float)height, 0), new Vector3(cols * (float)gridSize, (float)height, rows * (float)gridSize * scaleFactor));
         Gizmos.DrawLine(new Vector3(0, (float)height * scaleFactor, rows * (float)gridSize * scaleFactor), new Vector3(cols * (float)gridSize * scaleFactor, (float)height * scaleFactor, rows * (float)gridSize * scaleFactor));
+        Gizmos.DrawLine(new Vector3(cols * (float)gridSize * scaleFactor, (float)height * scaleFactor, rows * (float)gridSize * scaleFactor), new Vector3(cols * (float)gridSize * scaleFactor, (float)height * scaleFactor, 0));       
     }
 
     private void GridGizmo(float cols, float rows, float length, float width)
@@ -74,9 +73,8 @@ public class LevelGrid : MonoBehaviour
         float cols;
         float rows;
 
-        cols = length / ((float)(gridSize) * scaleFactor);
-        rows = width / ((float)(gridSize) * scaleFactor);
-
+        cols = (length / ((float)(gridSize) * scaleFactor));
+        rows = (width / ((float)(gridSize) * scaleFactor));
 
         for (int i = 1; i < cols; i++)
         {
@@ -108,6 +106,12 @@ public class LevelGrid : MonoBehaviour
 
     public bool IsInsideGridBounds(Vector3 point)
     {
+        float cols;
+        float rows;
+
+        cols = m_sizeColums;
+        rows = m_sizeRows; 
+
         float minX = transform.position.x;
         float maxX = minX + m_sizeColums;
         float minZ = transform.position.z;
@@ -146,12 +150,12 @@ public class LevelGrid : MonoBehaviour
     public void Update()
     {
         transform.position = Vector3.zero;
-        //m_gridMultiplier = (float)gridSize; 
-        m_realSizeColums = m_sizeColums * scaleFactor * (float)gridSize;
-        m_realSizeRows = m_sizeRows * scaleFactor * (float)gridSize;
 
-        m_boxCollider.size = new Vector3(m_realSizeColums, 0f, m_realSizeRows);
-        m_boxCollider.center = new Vector3(m_realSizeColums / 2f, (float)height, m_realSizeRows / 2f);
+        float cols = m_sizeColums; 
+        float rows = m_sizeRows; 
+
+        m_boxCollider.size = new Vector3(cols, 0f, rows);
+        m_boxCollider.center = new Vector3(cols / 2f, (float)height, rows / 2f);
     }
 
     private void OnDrawGizmos()
@@ -161,12 +165,10 @@ public class LevelGrid : MonoBehaviour
 
         if ((float)gridSize == 0)
             return;
-        //GridGizmo(m_realSizeColums / ((float)gridSize * scaleFactor), m_realSizeRows / ((float)gridSize * scaleFactor));
-        GridGizmo(128, 128);
-
+       
+        GridGizmo(m_sizeColums, m_sizeRows);
         Gizmos.color = _selectedColor;
-
-        GridFrameGizmo(m_realSizeColums / ((float)gridSize * scaleFactor), m_realSizeRows / ((float)gridSize * scaleFactor));
+        GridFrameGizmo(m_sizeColums, m_sizeRows);
         Gizmos.color = oldColor;
     }
 
