@@ -6,11 +6,12 @@ using EditorSupport;
 [CustomEditor(typeof(LevelGrid))]
 public class LevelGridEditor : Editor
 {
-
+    LevelGrid _myTarget;
 
     private void OnEnable()
     {
-
+        _myTarget = target as LevelGrid;
+        _myTarget.boxCollider = _myTarget.GetComponent<BoxCollider>();
         SceneView.onSceneGUIDelegate += EventHandler;
     }
 
@@ -21,21 +22,31 @@ public class LevelGridEditor : Editor
 
     private void EventHandler(SceneView sceneview)
     {
-
-        LevelGrid _myTarget = target as LevelGrid;
+        if (!_myTarget)
+            _myTarget = target as LevelGrid;
         if (_myTarget)
-            ToolsSupport.UnityHandlesHidden = _myTarget.hideUnityHandles; 
+            ToolsSupport.UnityHandlesHidden = _myTarget.hideUnityHandles;
+
+        _myTarget.transform.position = Vector3.zero;
+
+        float cols = _myTarget.sizeColums;
+        float rows = _myTarget.sizeRows;
+
+        _myTarget.boxCollider.size = new Vector3(cols, 0f, rows);
+        _myTarget.boxCollider.center = new Vector3(cols / 2f, (float)_myTarget.height, rows / 2f);
+
+        LevelGrid.Ins.UpdateGridHeight(); 
     }
 
 
 
     override public void OnInspectorGUI()
     {
-        DrawDefaultInspector(); 
+        DrawDefaultInspector();
 
-        if(GUILayout.Button("Open Grid Window", GUILayout.Width(255)))
+        if (GUILayout.Button("Open Grid Window", GUILayout.Width(255)))
         {
-            OpenLevelGridWindow(); 
+            OpenLevelGridWindow();
         }
     }
 
