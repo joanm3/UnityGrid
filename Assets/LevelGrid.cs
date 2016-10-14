@@ -116,6 +116,9 @@ public class LevelGrid : MonoBehaviour
 
     private void Awake()
     {
+#if !UNITY_EDITOR
+        Destroy(this); 
+#endif
         if (Ins != null && Ins != this)
             DestroyImmediate(this);
 

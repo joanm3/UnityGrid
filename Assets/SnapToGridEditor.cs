@@ -9,6 +9,7 @@ public class SnapToGridEditor : Editor
     SnapToGrid m_myTarget;
     bool m_instantiated = false;
     private bool m_controlPressed = false;
+    float distance;
 
     //GameObject m_instantiatedGameObject = new GameObject(); 
 
@@ -34,6 +35,8 @@ public class SnapToGridEditor : Editor
         Vector3 gridPos = Vector3.zero;
 
         RaycastHit hitInfo;
+        
+        //if (Physics.Raycast(worldRay, out hitInfo, 10000, LayerMask.NameToLayer("Grid")))
         if (Physics.Raycast(worldRay, out hitInfo, 10000))
         {
             //would be better to change the raycast for
@@ -44,7 +47,7 @@ public class SnapToGridEditor : Editor
             //if (hitInfo.transform.tag == "Grid")
             //if (hitInfo.transform.gameObject.name == "LevelGrid")
             //{
-                gridPos = hitInfo.point;
+            gridPos = hitInfo.point;
             //}
         }
         else
@@ -59,9 +62,23 @@ public class SnapToGridEditor : Editor
         float col = (float)gridPos.x / ((float)LevelGrid.Ins.gridSize * LevelGrid.Ins.scaleFactor);
         float row = (float)gridPos.z / ((float)LevelGrid.Ins.gridSize * LevelGrid.Ins.scaleFactor);
 
+
+
+
+
+        
+
+        if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
+        {
+            distance = Vector3.Distance(m_myTarget.transform.position, gridPos);
+        }
+
+        //if (distance > 10)
+        //    return; 
+
         //mouse click and dragandrop
-        if (Event.current.type == EventType.MouseDown && Event.current.button == 0 ||
-            Event.current.type == EventType.MouseDrag && Event.current.button == 0)
+        //if (Event.current.type == EventType.MouseDown && Event.current.button == 0 ||
+        if (Event.current.type == EventType.MouseDrag && Event.current.button == 0)
         {
             SnapToGrid((int)col, (int)row, LevelGrid.Ins.height);
         }
@@ -76,6 +93,7 @@ public class SnapToGridEditor : Editor
             m_controlPressed = false;
 
 
+        //if mouse released when control pressed, make a copy / otherwise, destroy old object. 
         if (Event.current.type == EventType.MouseUp && Event.current.button == 0)
         {
             m_instantiated = false;
@@ -107,15 +125,11 @@ public class SnapToGridEditor : Editor
             return;
 
         GameObject obj = m_myTarget.gameObject;
-        //GameObject obj;
         if (!m_instantiated)
         {
 
             if (PrefabUtility.GetPrefabParent(Selection.activeObject) != null)
             {
-                //obj = (GameObject)Instantiate(PrefabUtility.GetPrefabParent(Selection.activeObject));
-                //obj = PrefabUtility.InstantiatePrefab(Selection.activeObject as GameObject) as GameObject;
-                //obj = (GameObject)Instantiate(PrefabUtility.GetPrefabObject(Selection.activeObject));
                 obj = PrefabUtility.InstantiatePrefab(PrefabUtility.GetPrefabParent(Selection.activeObject) as GameObject) as GameObject;
             }
             else
