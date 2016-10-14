@@ -36,8 +36,7 @@ public class SnapToGridEditor : Editor
         HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Native));
         Ray worldRay = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
 
-        RaycastHit[] hits;
-        hits = Physics.RaycastAll(worldRay, 1000);
+        RaycastHit[] hits =  Physics.RaycastAll(worldRay, 1000);
 
         for (int i = 0; i < hits.Length; i++)
         {
@@ -82,7 +81,6 @@ public class SnapToGridEditor : Editor
             return;
 
         //mouse click and dragandrop
-        //if (Event.current.type == EventType.MouseDown && Event.current.button == 0 ||
         if (Event.current.type == EventType.MouseDrag && Event.current.button == 0)
         {
             SnapToGrid((int)col, (int)row, LevelGrid.Ins.height);
@@ -125,7 +123,7 @@ public class SnapToGridEditor : Editor
         if (!LevelGrid.Ins.snapToGrid)
             return;
 
-        //// Check out of bounds and if we have a piece selected
+        // Check out of bounds and if we have a piece selected
         if (!LevelGrid.Ins.IsInsideGridBounds(col, row))
             return;
 
@@ -139,7 +137,7 @@ public class SnapToGridEditor : Editor
             }
             else
             {
-                Debug.Log("prefab parent not found");
+                //Debug.Log("prefab parent not found");
                 obj = Instantiate(m_myTarget.gameObject);
             }
 

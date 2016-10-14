@@ -204,10 +204,13 @@ public class LevelGrid : MonoBehaviour
         }
     }
 
-    [MenuItem("GameObject/3D Object/Custom Object")]
+    [MenuItem("GameObject/3D Object/Snap To Grid GameObject")]
     public static void CreateObject()
     {
-        GameObject go = Instantiate(Resources.Load("SnapToGridTest", typeof(GameObject))) as GameObject;
+        GameObject go = Instantiate(Resources.Load("Standard SnapToGrid", typeof(GameObject))) as GameObject;
+        go.transform.position = Vector3.zero;
+        go.name = "SnapToGrid"; 
+        //GameObject go = PrefabUtility.InstantiatePrefab(PrefabUtility.GetPrefabParent(Selection.activeObject) as GameObject) as GameObject;
     }
 
 }
