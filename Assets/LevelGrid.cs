@@ -9,12 +9,14 @@ public class LevelGrid : MonoBehaviour
     //public GameObject testToGrid; 
     public static LevelGrid Ins;
 
+    public bool hideUnityHandles = false; 
     public enum Pow2 { g0 = 0, g1 = 1, g2 = 2, g4 = 4, g8 = 8, g16 = 16, g32 = 32, g64 = 64, g128 = 128, g256 = 256, g512 = 512, g1024 = 1024, g2048 = 2048 }
     public bool snapToGrid = true;
     public Pow2 gridSize = Pow2.g128;
     public float height;
     [Tooltip("Standard 3DSMax = 0.0254")]
     public float scaleFactor = 0.0254f;
+    public int heightIndex; 
     [HideInInspector]
     public GameObject selectedGameObject;
 
@@ -40,7 +42,7 @@ public class LevelGrid : MonoBehaviour
         set { m_sizeRows = value; }
     }
 
-    private void GridFrameGizmo(float length, float width)
+    private void GridFrameGizmo(float length, float width, float height)
     {
         float cols;
         float rows;
@@ -48,27 +50,13 @@ public class LevelGrid : MonoBehaviour
         cols = (length / ((float)(gridSize) * scaleFactor)); 
         rows = (width / ((float)(gridSize) * scaleFactor));
 
-        Gizmos.DrawLine(new Vector3(0, (float)height * scaleFactor, 0), new Vector3(0, (float)height, rows * (float)gridSize * scaleFactor));
-        Gizmos.DrawLine(new Vector3(0, (float)height * scaleFactor, 0), new Vector3(cols * (float)gridSize * scaleFactor, (float)height * scaleFactor, 0));
-        Gizmos.DrawLine(new Vector3(0, (float)height * scaleFactor, rows * (float)gridSize * scaleFactor), new Vector3(cols * (float)gridSize * scaleFactor, (float)height * scaleFactor, rows * (float)gridSize * scaleFactor));
-        Gizmos.DrawLine(new Vector3(cols * (float)gridSize * scaleFactor, (float)height * scaleFactor, rows * (float)gridSize * scaleFactor), new Vector3(cols * (float)gridSize * scaleFactor, (float)height * scaleFactor, 0));       
+        Gizmos.DrawLine(new Vector3(0, (float)height, 0), new Vector3(0, (float)height, rows * (float)gridSize * scaleFactor));
+        Gizmos.DrawLine(new Vector3(0, (float)height, 0), new Vector3(cols * (float)gridSize * scaleFactor, (float)height, 0));
+        Gizmos.DrawLine(new Vector3(0, (float)height, rows * (float)gridSize * scaleFactor), new Vector3(cols * (float)gridSize * scaleFactor, (float)height, rows * (float)gridSize * scaleFactor));
+        Gizmos.DrawLine(new Vector3(cols * (float)gridSize * scaleFactor, (float)height, rows * (float)gridSize * scaleFactor), new Vector3(cols * (float)gridSize * scaleFactor, (float)height, 0));       
     }
 
-    private void GridGizmo(float cols, float rows, float length, float width)
-    {
-        for (int i = 1; i < cols; i++)
-        {
-            Gizmos.DrawLine(
-                new Vector3(i * ((float)gridSize) * scaleFactor, (float)height * scaleFactor, 0), 
-                new Vector3(i * (float)gridSize * scaleFactor, (float)height * scaleFactor, rows * (float)gridSize * scaleFactor));
-        }
-        for (int j = 1; j < rows ; j++)
-        {
-            Gizmos.DrawLine(new Vector3(0, (float)height * scaleFactor, j * (float)gridSize) * scaleFactor, new Vector3(cols * (float)gridSize * scaleFactor, (float)height * scaleFactor, j * (float)gridSize * scaleFactor));
-        }
-    }
-
-    private void GridGizmo(float length, float width)
+    private void GridGizmo(float length, float width, float height)
     {
         float cols;
         float rows;
@@ -79,12 +67,18 @@ public class LevelGrid : MonoBehaviour
         for (int i = 1; i < cols; i++)
         {
             Gizmos.DrawLine(
-                new Vector3(i * ((float)gridSize) * scaleFactor, (float)height * scaleFactor, 0),
-                new Vector3(i * (float)gridSize * scaleFactor, (float)height * scaleFactor, rows * (float)gridSize * scaleFactor));
+                new Vector3(i * ((float)gridSize) * scaleFactor, (float)height, 0),
+                new Vector3(i * (float)gridSize * scaleFactor, (float)height, rows * (float)gridSize * scaleFactor));
         }
+
+
         for (int j = 1; j < rows; j++)
         {
-            Gizmos.DrawLine(new Vector3(0, (float)height * scaleFactor, j * (float)gridSize) * scaleFactor, new Vector3(cols * (float)gridSize * scaleFactor, (float)height * scaleFactor, j * (float)gridSize * scaleFactor));
+
+            Gizmos.DrawLine(
+                new Vector3(0, height, (j * (float)gridSize) * scaleFactor),
+                new Vector3((cols * (float)gridSize * scaleFactor), height, (j * (float)gridSize * scaleFactor)));
+
         }
     }
 
@@ -165,10 +159,13 @@ public class LevelGrid : MonoBehaviour
 
         if ((float)gridSize == 0)
             return;
+
+
+        height = heightIndex *  scaleFactor * (float)gridSize; 
        
-        GridGizmo(m_sizeColums, m_sizeRows);
+        GridGizmo(m_sizeColums, m_sizeRows, height);
         Gizmos.color = _selectedColor;
-        GridFrameGizmo(m_sizeColums, m_sizeRows);
+        GridFrameGizmo(m_sizeColums, m_sizeRows, height);
         Gizmos.color = oldColor;
     }
 

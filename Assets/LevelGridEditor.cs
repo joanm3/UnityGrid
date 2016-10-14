@@ -1,11 +1,31 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEditor;
+using EditorSupport;
 
 [CustomEditor(typeof(LevelGrid))]
 public class LevelGridEditor : Editor
 {
 
+
+    private void OnEnable()
+    {
+
+        SceneView.onSceneGUIDelegate += EventHandler;
+    }
+
+    private void OnDisable()
+    {
+        SceneView.onSceneGUIDelegate -= EventHandler;
+    }
+
+    private void EventHandler(SceneView sceneview)
+    {
+
+        LevelGrid _myTarget = target as LevelGrid;
+        if (_myTarget)
+            ToolsSupport.UnityHandlesHidden = _myTarget.hideUnityHandles; 
+    }
 
 
 

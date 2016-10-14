@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEditor;
-using EditorSupport;
+
 
 [CustomEditor(typeof(SnapToGrid))]
 public class SnapToGridEditor : Editor
@@ -29,7 +29,7 @@ public class SnapToGridEditor : Editor
         if (m_myTarget == null)
             m_myTarget = target as SnapToGrid;
 
-        ToolsSupport.UnityHandlesHidden = m_myTarget.hideUnityHandles;
+
 
         HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Native));
         Ray worldRay = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);

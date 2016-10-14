@@ -7,5 +7,4 @@ using UnityEngine.EventSystems;
 [ExecuteInEditMode]
 public class SnapToGrid : MonoBehaviour
 {
-    public bool hideUnityHandles = true; 
 }
