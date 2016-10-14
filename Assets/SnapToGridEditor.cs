@@ -45,15 +45,19 @@ public class SnapToGridEditor : Editor
             {
                 gridPos = hits[i].point;
             }
-
-            if (hits[i].transform.GetComponent<SnapToGrid>() != null)
-            {
-                onMouseOverGameObject = hits[i].transform.gameObject;
-            }
             else
             {
-                onMouseOverGameObject = null;
+                //only snaptogrid gameobjects are selectables
+                if (hits[i].transform.GetComponent<SnapToGrid>() != null)
+                {
+                    onMouseOverGameObject = hits[i].transform.gameObject;
+                }
+                else
+                {
+                    onMouseOverGameObject = null;
+                }
             }
+
         }
 
         //mouse position in the grid
@@ -75,7 +79,7 @@ public class SnapToGridEditor : Editor
         }
 
         if (!isThisObject)
-            return; 
+            return;
 
         //mouse click and dragandrop
         //if (Event.current.type == EventType.MouseDown && Event.current.button == 0 ||
