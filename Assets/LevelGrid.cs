@@ -14,13 +14,16 @@ public class LevelGrid : MonoBehaviour
     public enum Pow2 { g0 = 0, g1 = 1, g2 = 2, g4 = 4, g8 = 8, g16 = 16, g32 = 32, g64 = 64, g128 = 128, g256 = 256, g512 = 512, g1024 = 1024, g2048 = 2048 }
     public bool snapToGrid = true;
     public Pow2 gridSize = Pow2.g128;
-    public Pow2 heightSize = Pow2.g0;
+    public Pow2 heightGridSize = Pow2.g0;
     public float height;
     [Tooltip("Standard 3DSMax = 0.0254")]
     public float scaleFactor = 0.0254f;
     public int heightIndex;
     [HideInInspector]
     public GameObject selectedGameObject;
+    public bool showVerticalGrid;
+
+
 
 
     public float sizeColums = 25;
@@ -84,6 +87,73 @@ public class LevelGrid : MonoBehaviour
         }
     }
 
+    private void VerticalGridGizmo(Vector3 objectPosition, int numberOfRows, bool xAxis)
+    {
+
+        if (xAxis)
+        {
+            //columna 1
+            Gizmos.DrawLine(
+                new Vector3(objectPosition.x, objectPosition.y, objectPosition.z),
+                new Vector3(objectPosition.x, objectPosition.y + ((float)heightGridSize * scaleFactor * (numberOfRows / 2)), objectPosition.z)
+                );
+            Gizmos.DrawLine(
+                new Vector3(objectPosition.x, objectPosition.y, objectPosition.z),
+                new Vector3(objectPosition.x, objectPosition.y + ((float)heightGridSize * scaleFactor * (-numberOfRows / 2)), objectPosition.z)
+                );
+
+            //columna 2 x
+            Gizmos.DrawLine(
+                new Vector3(objectPosition.x + (((float)gridSize) * scaleFactor), objectPosition.y, objectPosition.z),
+                new Vector3(objectPosition.x + (((float)gridSize) * scaleFactor), objectPosition.y + ((float)heightGridSize * scaleFactor * (numberOfRows / 2)), objectPosition.z)
+                );
+            Gizmos.DrawLine(
+                new Vector3(objectPosition.x + (((float)gridSize) * scaleFactor), objectPosition.y, objectPosition.z),
+                new Vector3(objectPosition.x + (((float)gridSize) * scaleFactor), objectPosition.y + ((float)heightGridSize * scaleFactor * (-numberOfRows / 2)), objectPosition.z)
+                );
+            for (int j = -(numberOfRows / 2); j < (numberOfRows / 2) + 1; j++)
+            {
+                Gizmos.DrawLine(
+                    new Vector3(objectPosition.x, objectPosition.y + (j * (float)heightGridSize * scaleFactor), objectPosition.z),
+                    new Vector3(objectPosition.x + (((float)gridSize) * scaleFactor), objectPosition.y + (j * (float)heightGridSize * scaleFactor), objectPosition.z)
+                    );
+            }
+        }
+        else
+        {
+            //columna 1
+            Gizmos.DrawLine(
+                new Vector3(objectPosition.x, objectPosition.y, objectPosition.z),
+                new Vector3(objectPosition.x, objectPosition.y + ((float)heightGridSize * scaleFactor * (numberOfRows / 2)), objectPosition.z)
+                );
+            Gizmos.DrawLine(
+                new Vector3(objectPosition.x, objectPosition.y, objectPosition.z),
+                new Vector3(objectPosition.x, objectPosition.y + ((float)heightGridSize * scaleFactor * (-numberOfRows / 2)), objectPosition.z)
+                );
+
+            //columna 2 x
+            Gizmos.DrawLine(
+                new Vector3(objectPosition.x, objectPosition.y, (objectPosition.z + (((float)gridSize) * scaleFactor))),
+                new Vector3(objectPosition.x, objectPosition.y + ((float)heightGridSize * scaleFactor * (numberOfRows / 2)), (objectPosition.z + (((float)gridSize) * scaleFactor)))
+                );
+            Gizmos.DrawLine(
+                new Vector3(objectPosition.x, objectPosition.y, (objectPosition.z + (((float)gridSize) * scaleFactor))),
+                new Vector3(objectPosition.x, objectPosition.y + ((float)heightGridSize * scaleFactor * (-numberOfRows / 2)), (objectPosition.z + (((float)gridSize) * scaleFactor)))
+                );
+
+
+
+            for (int j = -(numberOfRows / 2); j < (numberOfRows / 2) + 1; j++)
+            {
+                Gizmos.DrawLine(
+                    new Vector3(objectPosition.x, objectPosition.y + (j * (float)heightGridSize * scaleFactor), objectPosition.z),
+                    new Vector3(objectPosition.x, objectPosition.y + (j * (float)heightGridSize * scaleFactor), objectPosition.z + (((float)gridSize) * scaleFactor))
+                    );
+            }
+
+        }
+    }
+
     public Vector3 WorldToGridCoordinates(Vector3 point)
     {
         Vector3 gridPoint = new Vector3(
@@ -97,6 +167,28 @@ public class LevelGrid : MonoBehaviour
         Vector3 worldPoint = new Vector3(
             transform.position.x + (col * (float)gridSize) * scaleFactor, (float)height,
             transform.position.z + (row * (float)gridSize) * scaleFactor);
+        return worldPoint;
+    }
+
+    public Vector3 VerticalGridToWorldCoordinates(float col, float row, Vector3 objectPosition, bool xAxis)
+    {
+        Vector3 worldPoint = Vector3.zero;
+        switch (xAxis)
+        {
+            case true:
+                worldPoint = new Vector3(
+                    transform.position.x + (col * (float)heightGridSize) * scaleFactor,
+                    transform.position.y + (row * (float)heightGridSize) * scaleFactor,
+                    objectPosition.z);
+                break;
+            case false:
+                worldPoint = new Vector3(
+                    objectPosition.x,
+                    transform.position.y + (row * (float)heightGridSize) * scaleFactor,
+                    transform.position.x + (col * (float)heightGridSize) * scaleFactor);
+                break;
+        }
+
         return worldPoint;
     }
 
@@ -125,7 +217,7 @@ public class LevelGrid : MonoBehaviour
         if (Ins == null)
             Ins = this;
 
-        gameObject.name = "LevelGrid"; 
+        gameObject.name = "LevelGrid";
 
         boxCollider = GetComponent<BoxCollider>();
     }
@@ -151,10 +243,12 @@ public class LevelGrid : MonoBehaviour
             return;
 
 
-        height = heightIndex * scaleFactor * (float)heightSize;
+        height = heightIndex * scaleFactor * (float)heightGridSize;
 
         GridGizmo(sizeColums, sizeRows, height);
         Gizmos.color = _selectedColor;
+        //Function not yet integrated. to do later. 
+        // VerticalGridGizmo(Selection.activeGameObject.transform.position, 8, false);
         GridFrameGizmo(sizeColums, sizeRows, height);
         Gizmos.color = oldColor;
     }
@@ -209,7 +303,7 @@ public class LevelGrid : MonoBehaviour
     {
         GameObject go = Instantiate(Resources.Load("Standard SnapToGrid", typeof(GameObject))) as GameObject;
         go.transform.position = Vector3.zero;
-        go.name = "SnapToGrid"; 
+        go.name = "SnapToGrid";
         //GameObject go = PrefabUtility.InstantiatePrefab(PrefabUtility.GetPrefabParent(Selection.activeObject) as GameObject) as GameObject;
     }
 

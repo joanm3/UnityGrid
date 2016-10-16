@@ -17,16 +17,4 @@ public class SnapToGrid : MonoBehaviour
 
     }
 
-
-    private void Update()
-    {
-        //BoxCollider boxCollider = GetComponent<BoxCollider>();
-        //boxCollider.enabled = EditorApplication.isPlaying; 
-    }
-
-    void OnMouseOver()
-    {
-        Debug.Log(name); 
-    }
-
 }

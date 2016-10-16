@@ -13,6 +13,7 @@ public class SnapToGridEditor : Editor
     Vector3 gridPos = new Vector3();
     GameObject onMouseOverGameObject;
     bool isThisObject = false;
+    private bool m_shiftPressed;
 
     //GameObject m_instantiatedGameObject = new GameObject(); 
 
@@ -95,6 +96,12 @@ public class SnapToGridEditor : Editor
         if ((Event.current.type == EventType.keyUp) && (Event.current.keyCode == KeyCode.LeftControl || Event.current.keyCode == KeyCode.RightControl))
             m_controlPressed = false;
 
+        if ((Event.current.type == EventType.keyDown) && (Event.current.keyCode == KeyCode.LeftShift || Event.current.keyCode == KeyCode.RightShift))
+            m_shiftPressed = true;
+
+        if ((Event.current.type == EventType.keyUp) && (Event.current.keyCode == KeyCode.LeftShift || Event.current.keyCode == KeyCode.RightShift))
+            m_shiftPressed = false;
+
 
         //if mouse released when control pressed, make a copy / otherwise, destroy old object. 
         if (Event.current.type == EventType.MouseUp && Event.current.button == 0)
@@ -103,7 +110,7 @@ public class SnapToGridEditor : Editor
             if (LevelGrid.Ins.selectedGameObject)
             {
                 //make copy if control is pressed
-                if (!m_controlPressed)
+                if (!m_shiftPressed)
                 {
                     Undo.IncrementCurrentGroup();
                     Undo.DestroyObjectImmediate(m_myTarget.gameObject);
